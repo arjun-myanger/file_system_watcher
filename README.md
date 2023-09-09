@@ -1,4 +1,5 @@
 File System Watcher
+
 A simple tool built with Rust that monitors changes in the file system. It watches directories and files for changes such as modifications, deletions, and creations. When a specified event occurs, the watcher triggers specific notifications.
 
 Features
