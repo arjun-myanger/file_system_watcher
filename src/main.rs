@@ -1,36 +1,37 @@
+// Import the notify library.
 extern crate notify;
 
-use notify::{watcher, RecursiveMode, Watcher, DebouncedEvent};
+// Bring in the necessary items from the notify library and standard library.
+use notify::{Watcher, RecursiveMode, Result};
 use std::env;
-use std::sync::mpsc::channel;
-use std::time::Duration;
+use std::path::Path;
 
-fn main() {
+// The main function where our program starts.
+fn main() -> Result<()> {
+    // Collect command-line arguments into a list.
     let args: Vec<String> = env::args().collect();
+
+    // If the user didn't provide exactly one argument (the path to watch), show them how to use the program.
     if args.len() != 2 {
         println!("Usage: {} <path_to_watch>", args[0]);
-        return;
+        return Ok(());
     }
+
+    // Get the path provided by the user.
     let path_to_watch = &args[1];
 
-    let (tx, rx) = channel();
-
-    // Create a watcher object with a delay of 1 second.
-    let mut watcher = watcher(tx, Duration::from_secs(1)).unwrap();
-
-    // Add the directory or file you want to watch.
-    watcher.watch(path_to_watch, RecursiveMode::Recursive).unwrap();
-
-    loop {
-        match rx.recv() {
-            Ok(event) => match event {
-                DebouncedEvent::Create(path) => println!("File created: {:?}", path),
-                DebouncedEvent::Write(path) => println!("File modified: {:?}", path),
-                DebouncedEvent::Remove(path) => println!("File deleted: {:?}", path),
-                DebouncedEvent::Rename(old_path, new_path) => println!("File renamed from {:?} to {:?}", old_path, new_path),
-                _ => println!("Other event: {:?}", event),
-            },
-            Err(e) => println!("Error: {:?}", e),
+    // Create a file watcher that's best suited for the current platform.
+    let mut watcher = notify::recommended_watcher(|res| {
+        // When an event occurs, either print the event or an error.
+        match res {
+            Ok(event) => println!("event: {:?}", event),
+            Err(e) => println!("watch error: {:?}", e),
         }
-    }
+    })?;
+
+    // Start watching the specified path and all its subdirectories.
+    watcher.watch(Path::new(path_to_watch), RecursiveMode::Recursive)?;
+
+    // Indicate successful execution.
+    Ok(())
 }
