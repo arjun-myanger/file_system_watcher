@@ -10,8 +10,17 @@ use std::time::{Instant, Duration};
 use std::sync::{Arc, Mutex};
 use std::fs;
 
+// Import the gui module.
+mod gui;
+
 // The main function where our program starts.
 fn main() -> Result<()> {
+    // Run the GUI
+    match gui::run_gui() {
+        Ok(_) => println!("GUI closed successfully."),
+        Err(e) => println!("Error running GUI: {:?}", e),
+    }
+
     // Collect the command-line arguments into a list.
     let args: Vec<String> = env::args().collect();
     
