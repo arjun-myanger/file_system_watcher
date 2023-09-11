@@ -3,10 +3,10 @@ use druid::widget::{Button, Flex, Label, TextBox, Controller, ControllerHost};
 // Import other necessary components from Druid.
 use druid::{AppLauncher, WindowDesc, Widget, Data, Lens, Selector, WidgetExt, Target};
 // Import necessary components from the notify crate.
-use notify::{RecursiveMode, RecommendedWatcher, EventKind, Watcher, immediate_watcher};
-use std::sync::mpsc;
+use notify::{RecursiveMode, EventKind, Watcher};
 use std::fs;
 use std::thread;
+use std::time::Duration;
 
 // Define a data structure to represent the state of our application.
 #[derive(Clone, Data, Lens)]
@@ -81,10 +81,8 @@ fn ui_builder() -> impl Widget<AppState> {
 
                 // Spawn a new thread for file watching.
                 thread::spawn(move || {
-                    let (tx, rx) = mpsc::channel();
-                    
-                    // Create the watcher with the appropriate event handler.
-                    let mut watcher = immediate_watcher(move |res: Result<notify::Event, notify::Error>| {
+                    // Create the watcher with the appropriate event handler and a 2-second delay.
+                    let mut watcher = Watcher::new_immediate(move |res: Result<notify::Event, notify::Error>| {
                         match res {
                             Ok(event) => {
                                 let message = match event.kind {
@@ -106,7 +104,7 @@ fn ui_builder() -> impl Widget<AppState> {
                                 eprintln!("Watch error: {:?}", e);
                             }
                         }
-                    }).unwrap();
+                    }, Duration::from_secs(2)).unwrap();
 
                     watcher.watch(&path_to_watch, RecursiveMode::Recursive).unwrap();
                 });
