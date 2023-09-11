@@ -2,7 +2,7 @@
 extern crate notify;
 
 // Import specific items from the "notify" library and the standard library.
-use notify::{Watcher, RecursiveMode, Result, event::{Event, EventKind}};
+use notify::{Watcher, RecursiveMode, Result, event::{Event, EventKind}, immediate_watcher};
 use std::env;
 use std::path::Path;
 use std::collections::HashSet;
@@ -44,7 +44,7 @@ fn main() -> Result<()> {
     let last_clear_clone = last_clear.clone();
 
     // Create a file watcher.
-    let mut watcher = notify::recommended_watcher(move |res: Result<Event>| {
+    let mut watcher = immediate_watcher(move |res: Result<Event>| {
         match res {
             Ok(event) => {
                 // Ignore changes related to the ".DS_Store" file.

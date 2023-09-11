@@ -3,7 +3,7 @@ use druid::widget::{Button, Flex, Label, TextBox, Controller, ControllerHost};
 // Import other necessary components from Druid.
 use druid::{AppLauncher, WindowDesc, Widget, Data, Lens, Selector, WidgetExt, Target};
 // Import necessary components from the notify crate.
-use notify::{RecursiveMode, RecommendedWatcher, EventKind, Watcher};
+use notify::{RecursiveMode, RecommendedWatcher, EventKind, Watcher, immediate_watcher};
 use std::sync::mpsc;
 use std::fs;
 use std::thread;
@@ -84,7 +84,7 @@ fn ui_builder() -> impl Widget<AppState> {
                     let (tx, rx) = mpsc::channel();
                     
                     // Create the watcher with the appropriate event handler.
-                    let mut watcher: RecommendedWatcher = notify::Watcher::new_immediate(move |res: Result<notify::Event, notify::Error>| {
+                    let mut watcher = immediate_watcher(move |res: Result<notify::Event, notify::Error>| {
                         match res {
                             Ok(event) => {
                                 let message = match event.kind {
