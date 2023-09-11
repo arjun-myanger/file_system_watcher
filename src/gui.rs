@@ -3,7 +3,7 @@ use druid::widget::{Button, Flex, Label, TextBox, Controller, ControllerHost};
 // Import other necessary components from Druid.
 use druid::{AppLauncher, WindowDesc, Widget, Data, Lens, Selector, WidgetExt, Target};
 // Import necessary components from the notify crate.
-use notify::{RecursiveMode, EventKind, Watcher};
+use notify::{RecursiveMode, EventKind, immediate_watcher};
 use std::fs;
 use std::thread;
 use std::time::Duration;
@@ -82,7 +82,7 @@ fn ui_builder() -> impl Widget<AppState> {
                 // Spawn a new thread for file watching.
                 thread::spawn(move || {
                     // Create the watcher with the appropriate event handler and a 2-second delay.
-                    let mut watcher = Watcher::new_immediate(move |res: Result<notify::Event, notify::Error>| {
+                    let mut watcher = immediate_watcher(move |res: Result<notify::Event, notify::Error>| {
                         match res {
                             Ok(event) => {
                                 let message = match event.kind {

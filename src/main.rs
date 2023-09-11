@@ -2,7 +2,7 @@
 extern crate notify;
 
 // Import specific items from the "notify" library and the standard library.
-use notify::{Watcher, RecursiveMode, event::{Event, EventKind}};
+use notify::{Watcher, RecursiveMode, event::{Event, EventKind}, immediate_watcher};
 use std::env;
 use std::path::Path;
 use std::collections::HashSet;
@@ -14,7 +14,7 @@ use std::fs;
 mod gui;
 
 // The main function where our program starts.
-fn main() -> Result<()> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Run the GUI
     match gui::run_gui() {
         Ok(_) => println!("GUI closed successfully."),
@@ -44,7 +44,7 @@ fn main() -> Result<()> {
     let last_clear_clone = last_clear.clone();
 
     // Create a file watcher with a 2-second delay.
-    let mut watcher = watcher(move |res: Result<Event>| {
+    let mut watcher = immediate_watcher(move |res: Result<Event, notify::Error>| {
         match res {
             Ok(event) => {
                 // Ignore changes related to the ".DS_Store" file.
