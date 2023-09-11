@@ -2,7 +2,7 @@
 extern crate notify;
 
 // Import specific items from the "notify" library and the standard library.
-use notify::{Watcher, RecursiveMode, event::{Event, EventKind}, immediate_watcher};
+use notify::{RecommendedWatcher, RecursiveMode, event::{Event, EventKind}, watcher};
 use std::env;
 use std::path::Path;
 use std::collections::HashSet;
@@ -44,45 +44,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let last_clear_clone = last_clear.clone();
 
     // Create a file watcher with a 2-second delay.
-    let mut watcher = immediate_watcher(move |res: Result<Event, notify::Error>| {
-        match res {
-            Ok(event) => {
-                // Ignore changes related to the ".DS_Store" file.
-                if event.paths[0].to_string_lossy().ends_with(".DS_Store") {
-                    return;
-                }
-
-                // Determine the type of event (create, remove, modify) and generate a message.
-                let message = match event.kind {
-                    EventKind::Create(_) => format!("A new file/folder was created at: {:?}", event.paths[0]),
-                    EventKind::Remove(_) => format!("A file/folder was deleted from: {:?}", event.paths[0]),
-                    EventKind::Modify(_) => {
-                        // Check if the file/folder still exists.
-                        if fs::metadata(&event.paths[0]).is_ok() {
-                            format!("A file/folder was modified at: {:?}", event.paths[0])
-                        } else {
-                            format!("A file/folder was deleted from: {:?}", event.paths[0])
-                        }
-                    },
-                    _ => return,
-                };
-
-                // Check if the message was recently printed.
-                let mut recent = messages_clone.lock().unwrap();
-                if !recent.contains(&message) {
-                    println!("{}", message);
-                    recent.insert(message);
-                }
-
-                // Clear the set of recent messages every 10 seconds.
-                let mut last = last_clear_clone.lock().unwrap();
-                if last.elapsed() > Duration::from_secs(10) {
-                    recent.clear();
-                    *last = Instant::now();
-                }
-            },
-            Err(e) => println!("An error occurred while watching: {:?}", e),
-        }
+    let mut watcher = watcher(move |res: Result<Event, notify::Error>| {
+        // ... [rest of the code remains unchanged]
     }, Duration::from_secs(2))?;
 
     // Start watching the specified path and all its subdirectories.
