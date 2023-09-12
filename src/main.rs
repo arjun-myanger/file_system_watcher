@@ -1,15 +1,9 @@
-// Import the external "notify" library.
-extern crate notify;
-
-// Import specific items from the "notify" library and the standard library.
+// Import specific items from the standard library.
 use std::env;
-use std::path::Path;
 use std::collections::HashSet;
-use std::time::{Instant};
+use std::time::Instant;
 use std::sync::{Arc, Mutex};
-use notify::{RecursiveMode};
-use std::time::Duration;
-
+use std::process::Command; // For executing watchexec command
 
 // Import the gui module.
 mod gui;
@@ -35,7 +29,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let path_to_watch = &args[1];
 
     // Create a shared set to store recent messages.
-    let recent_messages = Arc::new(Mutex::new(HashSet::new()));
+    let recent_messages = Arc::new(Mutex::new(HashSet::<String>::new()));
     
     // Store the current time to know when to clear the set of recent messages.
     let last_clear = Arc::new(Mutex::new(Instant::now()));
@@ -44,16 +38,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let messages_clone = recent_messages.clone();
     let last_clear_clone = last_clear.clone();
 
-    // Create a file watcher with a 2-second delay.
-    let (tx, rx) = std::sync::mpsc::channel();
-    let mut watcher = notify::RecommendedWatcher::new(tx).unwrap();
-
-
-
- // Used the generic watcher function
-
-    // Start watching the specified path and all its subdirectories.
-    watcher.watch(Path::new(path_to_watch), RecursiveMode::Recursive)?;
+    // Use watchexec to watch the specified path.
+    let mut command = Command::new("watchexec")
+        .arg("--postpone")
+        .arg("--")
+        .arg("echo")
+        .arg("File changed!")
+        .spawn()
+        .expect("Failed to start watchexec");
 
     // Keep the main thread alive indefinitely.
     std::thread::park();  
