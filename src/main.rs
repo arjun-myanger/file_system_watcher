@@ -5,9 +5,11 @@ extern crate notify;
 use std::env;
 use std::path::Path;
 use std::collections::HashSet;
-use std::time::{Instant, Duration};
+use std::time::{Instant};
 use std::sync::{Arc, Mutex};
-use notify::{RecommendedWatcher, RecursiveMode, Watcher}; // Removed the unused Event import
+use notify::{RecursiveMode};
+use std::time::Duration;
+
 
 // Import the gui module.
 mod gui;
@@ -44,7 +46,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Create a file watcher with a 2-second delay.
     let (tx, rx) = std::sync::mpsc::channel();
-    let mut watcher = notify::watcher(tx, Duration::from_secs(2)).unwrap();
+    let mut watcher = notify::RecommendedWatcher::new(tx).unwrap();
+
+
 
  // Used the generic watcher function
 

@@ -3,7 +3,7 @@ use druid::widget::{Button, Flex, Label, TextBox, Controller, ControllerHost};
 // Import other necessary components from Druid.
 use druid::{AppLauncher, WindowDesc, Widget, Data, Lens, Selector, WidgetExt}; // Added WidgetExt for the lens method
 // Import necessary components from the notify crate.
-use notify::{RecursiveMode, Watcher}; // Added Watcher trait
+use notify::RecursiveMode;
 use std::sync::mpsc; // Added for channel creation
 use std::thread;
 use std::time::Duration;
@@ -84,7 +84,7 @@ fn ui_builder() -> impl Widget<AppState> {
                 // Spawn a new thread for file watching.
                 thread::spawn(move || {
                     let (tx, rx) = mpsc::channel(); // Create a channel for communication
-                    let mut watcher = notify::watcher(tx, Duration::from_secs(2)).unwrap();
+                    let mut watcher = notify::RecommendedWatcher::new(tx).unwrap();
  // Use the generic watcher function
                     watcher.watch(&path_to_watch, RecursiveMode::Recursive).unwrap();
 
