@@ -1,9 +1,5 @@
 // Import specific items from the standard library.
 use std::env;
-use std::collections::HashSet;
-use std::time::Instant;
-use std::sync::{Arc, Mutex};
-use std::process::Command; // For executing watchexec command
 
 // Import the gui module.
 mod gui;
@@ -25,28 +21,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
     
-    // Get the path provided by the user.
-    let path_to_watch = &args[1];
-
-    // Create a shared set to store recent messages.
-    let recent_messages = Arc::new(Mutex::new(HashSet::<String>::new()));
-    
-    // Store the current time to know when to clear the set of recent messages.
-    let last_clear = Arc::new(Mutex::new(Instant::now()));
-
-    // Clone the shared set and timestamp for use inside the watcher closure.
-    let messages_clone = recent_messages.clone();
-    let last_clear_clone = last_clear.clone();
-
-    // Use watchexec to watch the specified path.
-    let mut command = Command::new("watchexec")
-        .arg("--postpone")
-        .arg("--")
-        .arg("echo")
-        .arg("File changed!")
-        .spawn()
-        .expect("Failed to start watchexec");
-
     // Keep the main thread alive indefinitely.
     std::thread::park();  
     Ok(())
