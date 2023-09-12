@@ -2,12 +2,12 @@
 extern crate notify;
 
 // Import specific items from the "notify" library and the standard library.
-use notify::{Watcher, RecommendedWatcher, RecursiveMode, event::{Event, EventKind}};
 use std::env;
 use std::path::Path;
 use std::collections::HashSet;
 use std::time::{Instant, Duration};
 use std::sync::{Arc, Mutex};
+use notify::{RecommendedWatcher, RecursiveMode, Watcher}; // Removed the unused Event import
 
 // Import the gui module.
 mod gui;
@@ -43,9 +43,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let last_clear_clone = last_clear.clone();
 
     // Create a file watcher with a 2-second delay.
-    let mut watcher = watcher(move |res: Result<Event, notify::Error>| {
-        // ... [rest of the code remains unchanged]
-    }, Duration::from_secs(2))?;
+    let (tx, rx) = std::sync::mpsc::channel();
+    let mut watcher = notify::watcher(tx, Duration::from_secs(2)).unwrap();
+
+ // Used the generic watcher function
 
     // Start watching the specified path and all its subdirectories.
     watcher.watch(Path::new(path_to_watch), RecursiveMode::Recursive)?;
