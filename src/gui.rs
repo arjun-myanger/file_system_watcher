@@ -1,9 +1,9 @@
 // Import specific widgets from the Druid library.
 use druid::widget::{Button, Flex, Label, TextBox, Controller, ControllerHost};
 // Import other necessary components from Druid.
-use druid::{AppLauncher, WindowDesc, Widget, Data, Lens, Selector, WidgetExt, Target};
+use druid::{AppLauncher, WindowDesc, Widget, Data, Lens, Selector, Target};
 // Import necessary components from the notify crate.
-use notify::{RecursiveMode, EventKind, watcher, RecommendedWatcher};
+use notify::{RecursiveMode, EventKind, RecommendedWatcher};
 use std::fs;
 use std::thread;
 use std::time::Duration;

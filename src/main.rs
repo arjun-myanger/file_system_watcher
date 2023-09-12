@@ -2,13 +2,12 @@
 extern crate notify;
 
 // Import specific items from the "notify" library and the standard library.
-use notify::{RecommendedWatcher, RecursiveMode, event::{Event, EventKind}, watcher};
+use notify::{Watcher, RecommendedWatcher, RecursiveMode, event::{Event, EventKind}};
 use std::env;
 use std::path::Path;
 use std::collections::HashSet;
 use std::time::{Instant, Duration};
 use std::sync::{Arc, Mutex};
-use std::fs;
 
 // Import the gui module.
 mod gui;
