@@ -97,11 +97,14 @@ fn ui_builder() -> impl Widget<AppState> {
             if !data.is_watching {
                 // Clone the data to move into the thread.
                 let sink = _ctx.get_external_handle();
+                let path = data.path_to_watch.clone(); // Clone the path to move into the thread.
 
                 // Spawn a new thread for file watching.
                 thread::spawn(move || {
-                    // Execute the watchexec command to detect file changes.
+                    // Execute the watchexec command to detect file changes in the specified path.
                     let output = Command::new("watchexec")
+                        .arg("-w")
+                        .arg(&path) // Monitor the specified path.
                         .arg("--")
                         .arg("echo")
                         .arg("File changed!")
