@@ -1,6 +1,6 @@
 // Import specific widgets from the Druid library.
 use druid::widget::{Button, Flex, Label, TextBox, Controller, ControllerHost};
-use druid::{AppLauncher, WindowDesc, Widget, Data, Lens, Selector, Target};
+use druid::{AppLauncher, WindowDesc, Widget, Data, Lens, Selector, WidgetExt, Target};
 use std::process::{Command, Stdio};
 use std::thread;
 use std::io::BufRead;  // Add this line to import BufRead trait
