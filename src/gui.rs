@@ -77,25 +77,11 @@ fn ui_builder() -> impl Widget<AppState> {
                         let reader = std::io::BufReader::new(output);
                         for line in reader.lines() {
                             let message = line.expect("Failed to read line");
-                            let parts: Vec<&str> = message.splitn(2, ' ').collect();  // Split the message into two parts
-                            if parts.len() == 2 {
-                                let event = match parts[0] {
-                                    "Create" => "File created",
-                                    "Write" => "File modified",
-                                    "Remove" => "File deleted",
-                                    _ => "File changed",
-                                };
-                                let file_name = parts[1];
-                                let formatted_message = format!("{}: {}", event, file_name);
-                                sink.submit_command(UPDATE_MESSAGE, Box::new(formatted_message), Target::Auto).unwrap();
-                            } else {
-                                sink.submit_command(UPDATE_MESSAGE, Box::new("Unknown change detected".to_string()), Target::Auto).unwrap();
-                            }
+                            // Directly submit the raw output to the GUI
+                            sink.submit_command(UPDATE_MESSAGE, Box::new(message.clone()), Target::Auto).unwrap();
                         }
                     }
                 });
-                
-                
 
                 data.message = "Started watching!".to_string();
                 data.is_watching = true;
