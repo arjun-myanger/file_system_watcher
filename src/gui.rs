@@ -63,6 +63,8 @@ fn ui_builder() -> impl Widget<AppState> {
                 let sink = _ctx.get_external_handle();
                 let path = data.path_to_watch.clone();
 
+                println!("Starting watch on path: {}", path); // Added print statement
+
                 thread::spawn(move || {
                     let mut child = Command::new("watchexec")
                         .arg("-w")
@@ -77,6 +79,7 @@ fn ui_builder() -> impl Widget<AppState> {
                         let reader = std::io::BufReader::new(output);
                         for line in reader.lines() {
                             let message = line.expect("Failed to read line");
+                            println!("Received output: {}", message); // Added print statement
                             // Directly submit the raw output to the GUI
                             sink.submit_command(UPDATE_MESSAGE, Box::new(message.clone()), Target::Auto).unwrap();
                         }
