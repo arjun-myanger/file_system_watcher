@@ -69,19 +69,33 @@ fn ui_builder() -> impl Widget<AppState> {
                         .arg(&path)
                         .arg("--")
                         .arg("echo")
-                        .arg("File changed!")
+                        .arg("{event} {path}")  // This will output the event type and the path of the changed file
                         .stdout(Stdio::piped())
                         .spawn()
                         .expect("Failed to execute command");
-
+                
                     if let Some(output) = child.stdout.take() {
                         let reader = std::io::BufReader::new(output);
                         for line in reader.lines() {
                             let message = line.expect("Failed to read line");
-                            sink.submit_command(UPDATE_MESSAGE, Box::new(message), Target::Auto).unwrap();
+                            let parts: Vec<&str> = message.split_whitespace().collect();
+                            if parts.len() == 2 {
+                                let event = match parts[0] {
+                                    "Created" => "File created",
+                                    "Modified" => "File modified",
+                                    "Removed" => "File deleted",
+                                    _ => "File changed",
+                                };
+                                let file_name = parts[1];
+                                let formatted_message = format!("{}: {}", event, file_name);
+                                sink.submit_command(UPDATE_MESSAGE, Box::new(formatted_message), Target::Auto).unwrap();
+                            } else {
+                                sink.submit_command(UPDATE_MESSAGE, Box::new("Unknown change detected".to_string()), Target::Auto).unwrap();
+                            }
                         }
                     }
                 });
+                
 
                 data.message = "Started watching!".to_string();
                 data.is_watching = true;
