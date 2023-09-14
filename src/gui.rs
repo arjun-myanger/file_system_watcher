@@ -1,6 +1,6 @@
 // Import specific widgets from the Druid library.
 use druid::widget::{Button, Flex, Label, TextBox, Controller, ControllerHost};
-use druid::{AppLauncher, WindowDesc, Widget, Data, Lens, Selector, WidgetExt, Target};
+use druid::{AppLauncher, WindowDesc, Widget, Data, Lens, Selector, Target};
 use std::process::{Command, Stdio};
 use std::thread;
 use std::io::BufRead;  // Add this line to import BufRead trait
@@ -53,10 +53,9 @@ fn ui_builder() -> impl Widget<AppState> {
     col.add_child(message_label);
 
     let path_input = TextBox::new()
-    .with_placeholder("Enter path to watch")
-    .lens(AppState::path_to_watch)
-    .multiline(true);  // Add this line
-col.add_child(path_input);
+        .with_placeholder("Enter path to watch")
+        .lens(AppState::path_to_watch);
+    col.add_child(path_input);
 
     let greet_button = Button::new("Start Watching")
         .on_click(move |_ctx, data: &mut AppState, _env| {
