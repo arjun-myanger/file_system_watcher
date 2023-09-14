@@ -67,9 +67,8 @@ fn ui_builder() -> impl Widget<AppState> {
                     let mut child = Command::new("watchexec")
                         .arg("-w")
                         .arg(&path)
-                        .arg("--")
+                        .arg("--postpone")  // Use the --postpone option
                         .arg("echo")
-                        .arg("{event} {path}")  // This will output the event type and the path of the changed file
                         .stdout(Stdio::piped())
                         .spawn()
                         .expect("Failed to execute command");
@@ -78,12 +77,12 @@ fn ui_builder() -> impl Widget<AppState> {
                         let reader = std::io::BufReader::new(output);
                         for line in reader.lines() {
                             let message = line.expect("Failed to read line");
-                            let parts: Vec<&str> = message.split_whitespace().collect();
+                            let parts: Vec<&str> = message.splitn(2, ' ').collect();  // Split the message into two parts
                             if parts.len() == 2 {
                                 let event = match parts[0] {
-                                    "Created" => "File created",
-                                    "Modified" => "File modified",
-                                    "Removed" => "File deleted",
+                                    "Create" => "File created",
+                                    "Write" => "File modified",
+                                    "Remove" => "File deleted",
                                     _ => "File changed",
                                 };
                                 let file_name = parts[1];
@@ -95,6 +94,7 @@ fn ui_builder() -> impl Widget<AppState> {
                         }
                     }
                 });
+                
                 
 
                 data.message = "Started watching!".to_string();
