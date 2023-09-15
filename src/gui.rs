@@ -28,6 +28,7 @@ impl Controller<AppState, Flex<AppState>> for MessageController {
     ) {
         if let druid::Event::Command(cmd) = event {
             if cmd.is(UPDATE_MESSAGE) {
+                println!("Received message in GUI: {}", cmd.get_unchecked(UPDATE_MESSAGE).clone()); // Added print statement
                 data.message = cmd.get_unchecked(UPDATE_MESSAGE).clone();
             }
         }
@@ -63,9 +64,10 @@ fn ui_builder() -> impl Widget<AppState> {
                 let sink = _ctx.get_external_handle();
                 let path = data.path_to_watch.clone();
 
-                println!("Starting watch on path: {}", path); // Added print statement
+                println!("Starting the watch thread..."); // Added print statement
 
                 thread::spawn(move || {
+                    println!("Executing watchexec command..."); // Added print statement
                     let mut child = Command::new("watchexec")
                         .arg("-w")
                         .arg(&path)
@@ -75,16 +77,19 @@ fn ui_builder() -> impl Widget<AppState> {
                         .spawn()
                         .expect("Failed to execute command");
                 
+                    println!("Command executed. Reading output..."); // Added print statement
+
                     if let Some(output) = child.stdout.take() {
                         let reader = std::io::BufReader::new(output);
                         for line in reader.lines() {
                             let message = line.expect("Failed to read line");
-                            println!("Received output: {}", message); // Added print statement
-                            // Directly submit the raw output to the GUI
+                            println!("Raw output: {}", message); // Added print statement
                             sink.submit_command(UPDATE_MESSAGE, Box::new(message.clone()), Target::Auto).unwrap();
                         }
                     }
                 });
+
+                println!("Watch thread started."); // Added print statement
 
                 data.message = "Started watching!".to_string();
                 data.is_watching = true;
