@@ -5,7 +5,7 @@ use std::process::{Command, Stdio};
 use std::thread;
 use std::io::BufRead;  // Add this line to import BufRead trait
 
-// Define a data structure to represent the state of the application.
+// Define a data structure to represent the state of our application.
 #[derive(Clone, Data, Lens)]
 struct AppState {
     is_watching: bool,
